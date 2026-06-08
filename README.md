@@ -1,22 +1,16 @@
 # MemorySpark AI
 
-MemorySpark AI is a Streamlit web application for guided reminiscence, memory categorization, and cognitive stimulation. It uses Gemini 2.5 Flash to analyze a user's memory and return a structured reflection that can support dementia care, caregiver conversations, research workflows, and cognitive health programs.
+MemorySpark AI is a Streamlit research prototype for guided reminiscence, memory categorization, and cognitive stimulation. It uses Gemini to support memory analysis while keeping the application compatible with local development and Streamlit Cloud deployment.
 
 ## What it does
 
-- Accepts a free-text memory from the user.
-- Identifies the dominant memory theme: Family, Childhood, Friendship, Education, Travel, Celebration, Career, or Other.
-- Produces a memory richness score from 1 to 10.
-- Generates sensory recall prompts about sounds, smells, sights, and objects.
-- Generates emotional reflection prompts about feelings, relationships, and meaning.
-- Creates a short storytelling spark sentence starter.
-- Stores each submitted memory in Streamlit session state.
-- Summarizes sidebar statistics for total memories, most common theme, and average richness score.
-
-## Project structure
-
-- [app.py](app.py) - Streamlit application and Gemini analysis pipeline.
-- [requirements.txt](requirements.txt) - Python dependencies.
+- Accepts a free-text memory and optional caregiver notes.
+- Detects themes such as Family, Childhood, School, Travel, Friendship, Celebration, Career, and Other.
+- Calculates memory richness from emotional, sensory, people, and place references.
+- Classifies sentiment as Positive, Neutral, Reflective, or Melancholic.
+- Generates the Creative Cognitive Stimulation Module with sensory recall questions, emotional reflection questions, a short poem, and a storytelling prompt.
+- Stores every memory in Streamlit session state.
+- Supports a sidebar journal, chronological timeline, charts, and export-ready output.
 
 ## Local run
 
@@ -26,10 +20,16 @@ MemorySpark AI is a Streamlit web application for guided reminiscence, memory ca
 pip install -r requirements.txt
 ```
 
-2. Set your Gemini API key as an environment variable:
+2. Configure the Gemini API key securely:
 
 ```bash
 export GEMINI_API_KEY="your_api_key_here"
+```
+
+Or create `.streamlit/secrets.toml` with:
+
+```toml
+GEMINI_API_KEY = "your_api_key_here"
 ```
 
 3. Start the app:
@@ -38,52 +38,52 @@ export GEMINI_API_KEY="your_api_key_here"
 streamlit run app.py
 ```
 
-If you prefer Streamlit secrets, create `.streamlit/secrets.toml` with `GEMINI_API_KEY = "..."`.
-
 ## Deployment instructions
 
 ### Streamlit Community Cloud
 
 1. Push the repository to GitHub.
 2. Create a new Streamlit app from the repository.
-3. Set `app.py` as the main file.
-4. Add `GEMINI_API_KEY` in the app secrets or as a repository secret.
+3. Set `app.py` as the entry point.
+4. Add `GEMINI_API_KEY` in Streamlit secrets.
 5. Deploy.
 
-### Containerized deployment
+### Local development
 
-The app only needs Python and the dependencies in `requirements.txt`, so it can also run in Docker, on a VM, or inside a research workstation with the same environment variable configuration.
+1. Export `GEMINI_API_KEY` in your shell, or use `.streamlit/secrets.toml`.
+2. Run `streamlit run app.py`.
 
 ## Architecture diagram
 
 ```mermaid
 flowchart LR
 	U[User] --> UI[Streamlit Frontend]
-	UI --> S[Session State Journal]
-	UI --> P[Prompt Builder]
-	P --> G[Gemini 2.5 Flash]
-	G --> J[Structured JSON Analysis]
-	J --> UI
-	UI --> ST[Sidebar Statistics]
-	J --> F[Fallback Local Analyzer]
-	F --> UI
+	UI --> K[Secure Gemini Key Loader]
+	K --> G[Gemini API]
+	UI --> J[Session Memory Journal]
+	J --> D[Research Dashboard]
+	J --> T[Timeline View]
+	J --> X[Export to Markdown/Text]
+	G --> A[Memory Analysis + Creative Module]
+	A --> UI
 ```
 
 ## Sample screenshot mockups
 
 ### 1. Main analysis view
 
-The screen opens with a calm clinical header, a large memory input box, and a primary action button. After submission, the page shows the detected theme, richness score, sensory prompts, emotional reflection questions, and a short storytelling spark in separate bordered cards.
+The screen opens with a calm clinical header, a memory input area, and an optional caregiver notes field. After submission, the app shows the theme badges, richness analysis, sentiment, cognitive stimulation index, and the Creative Cognitive Stimulation Module in bordered panels.
 
-### 2. Sidebar insights
+### 2. Sidebar journal
 
-The sidebar presents compact metrics for total memories logged, the most common theme, and average richness score. Below the metrics, a short list of logged memories helps caregivers or researchers review recent entries quickly.
+The sidebar contains a selectable list of previous memories, recent-entry previews, and a clear-journal action. Choosing an entry loads it into the main panel for review.
 
-### 3. Empty-state view
+### 3. Research dashboard and analytics
 
-Before any input is submitted, the app displays guidance text, example prompt suggestions, and a neutral clinical note explaining that the tool supports reflection rather than diagnosis.
+The dashboard shows metric cards for total memories, average richness, most common theme, and session length. Below that, Plotly charts summarize theme distribution, richness over time, and sentiment distribution.
 
 ## Notes
 
-- The app falls back to a local heuristic analyzer if Gemini is unavailable, so the interface remains usable during setup or offline development.
-- For production deployments, keep the API key in secrets or environment variables rather than hardcoding it into the source.
+- The application stops with a Streamlit error if `GEMINI_API_KEY` is missing.
+- No API keys are hardcoded into the source.
+- The app stays in a single Python file for simple deployment.
