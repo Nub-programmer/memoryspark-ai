@@ -116,7 +116,7 @@ def get_gemini_client() -> Optional[Any]:
 def configure_page() -> None:
     st.set_page_config(
         page_title="MemorySpark AI",
-        page_icon="MemorySpark AI",
+        page_icon="M",
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -270,7 +270,7 @@ Rules:
 - Do not mention that you are an AI.
 
 Memory:
-"""{memory_text}"""
+{memory_text}
 """
 
 
@@ -529,47 +529,42 @@ def render_question_list(title: str, questions: List[str]) -> None:
 
 
 def render_analysis(memory_text: str, analysis: Dict[str, Any]) -> None:
-    st.markdown('<div class="section-card">', unsafe_allow_html=True)
-    st.subheader("Memory Theme Analysis")
-    render_theme_badges(analysis["primary_theme"], analysis["secondary_themes"])
-    st.write(analysis["theme_reason"])
-    st.markdown('</div>', unsafe_allow_html=True)
+    with st.container(border=True):
+        st.subheader("Memory Theme Analysis")
+        render_theme_badges(analysis["primary_theme"], analysis["secondary_themes"])
+        st.write(analysis["theme_reason"])
 
     cols = st.columns([1, 2])
     with cols[0]:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Memory Richness Score")
-        st.metric("Score", analysis["richness_score"], help="1 = sparse memory detail, 10 = highly vivid memory detail")
-        st.progress(analysis["richness_score"] / 10)
-        st.write(analysis["richness_reason"])
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.subheader("Memory Richness Score")
+            st.metric("Score", analysis["richness_score"], help="1 = sparse memory detail, 10 = highly vivid memory detail")
+            st.progress(analysis["richness_score"] / 10)
+            st.write(analysis["richness_reason"])
 
     with cols[1]:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Storytelling Spark")
-        st.write(analysis["storytelling_spark"])
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.subheader("Storytelling Spark")
+            st.write(analysis["storytelling_spark"])
 
     sensory = analysis["sensory_recall"]
     emotional = analysis["emotional_reflection"]
 
     left, right = st.columns(2)
     with left:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Sensory Recall")
-        render_question_list("Sounds", sensory["sounds"])
-        render_question_list("Smells", sensory["smells"])
-        render_question_list("Sights", sensory["sights"])
-        render_question_list("Objects", sensory["objects"])
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.subheader("Sensory Recall")
+            render_question_list("Sounds", sensory["sounds"])
+            render_question_list("Smells", sensory["smells"])
+            render_question_list("Sights", sensory["sights"])
+            render_question_list("Objects", sensory["objects"])
 
     with right:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Emotional Reflection")
-        render_question_list("Feelings", emotional["feelings"])
-        render_question_list("Relationships", emotional["relationships"])
-        render_question_list("Meaning", emotional["meaning"])
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container(border=True):
+            st.subheader("Emotional Reflection")
+            render_question_list("Feelings", emotional["feelings"])
+            render_question_list("Relationships", emotional["relationships"])
+            render_question_list("Meaning", emotional["meaning"])
 
     with st.expander("View structured analysis", expanded=False):
         st.json(analysis)
@@ -577,28 +572,20 @@ def render_analysis(memory_text: str, analysis: Dict[str, Any]) -> None:
 
 
 def render_intro() -> None:
-    st.markdown(
-        """
-        <div class="hero">
-            <h1>MemorySpark AI</h1>
-            <p>
+    with st.container(border=True):
+        st.markdown("<h1>MemorySpark AI</h1>", unsafe_allow_html=True)
+        st.markdown(
+            """
+            <p class="muted">
                 A clinical, accessible reminiscence assistant that helps users reflect on a memory,
                 identify its theme, explore sensory detail, and generate gentle follow-up prompts.
             </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
 
-    st.markdown(
-        """
-        <div class="section-card">
-            <strong>Suggested input:</strong>
-            <span class="muted">A family dinner, a school day, a favorite trip, a work milestone, or any small moment you want to revisit.</span>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    with st.container(border=True):
+        st.write("Suggested input: a family dinner, a school day, a favorite trip, a work milestone, or any small moment you want to revisit.")
 
 
 def main() -> None:
@@ -631,38 +618,29 @@ def main() -> None:
             render_analysis(sanitized, analysis)
 
     if not st.session_state.memory_journal:
-        st.markdown(
-            """
-            <div class="section-card">
-                <h3 style="margin-top: 0;">How the app works</h3>
-                <p class="muted">
-                    Submit a memory once to generate the theme analysis, richness score, sensory recall prompts,
-                    emotional reflection questions, and a storytelling starter. Every submitted memory remains in the
-                    session journal until you clear it.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Memory Journal Review")
-        for entry in reversed(st.session_state.memory_journal):
-            theme = entry["analysis"]["primary_theme"]
-            score = entry["analysis"]["richness_score"]
-            timestamp = entry["timestamp"]
-            memory = entry["memory"]
-            preview = memory if len(memory) <= 160 else memory[:157] + "..."
-            st.markdown(
-                f"""
-                <div class="journal-item">
-                    <div><strong>{timestamp}</strong> · {theme} · Richness {score}/10</div>
-                    <div style="margin-top: 0.25rem;">{preview}</div>
-                </div>
-                """,
-                unsafe_allow_html=True,
+        with st.container(border=True):
+            st.subheader("How the app works")
+            st.write(
+                "Submit a memory once to generate the theme analysis, richness score, sensory recall prompts, emotional reflection questions, and a storytelling starter. Every submitted memory remains in the session journal until you clear it."
             )
-        st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        with st.container(border=True):
+            st.subheader("Memory Journal Review")
+            for entry in reversed(st.session_state.memory_journal):
+                theme = entry["analysis"]["primary_theme"]
+                score = entry["analysis"]["richness_score"]
+                timestamp = entry["timestamp"]
+                memory = entry["memory"]
+                preview = memory if len(memory) <= 160 else memory[:157] + "..."
+                st.markdown(
+                    f"""
+                    <div class="journal-item">
+                        <div><strong>{timestamp}</strong> · {theme} · Richness {score}/10</div>
+                        <div style="margin-top: 0.25rem;">{preview}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
 
 if __name__ == "__main__":
